@@ -44,7 +44,7 @@ class FakeData():
                     try:
                         while True:
                             cod_poco = f"POCO_{random.randint(100, 6606)}"
-                            if cod_poco not in pocos_cadastrados or cod_poco not in novos_pocos:
+                            if cod_poco not in pocos_cadastrados and cod_poco not in novos_pocos:
                                 novos_pocos.append(cod_poco)
                                 break
 
@@ -166,7 +166,7 @@ class FakeData():
                         vida_util = random.randint(10, 25)
 
                         ultimo_teste = fake.date_between(start_date="-6m", end_date="today")
-                        eficiencia = random.randint(60, 100)
+                        eficiencia = random.uniform(0.6, 1)
 
                         chunk_data.append({
                             "cod_equipamento": cod_equipamento,
@@ -270,7 +270,7 @@ class FakeData():
                         else:
                             producao_barris_dia = random.randint(100, 5_000)
 
-                        agua_produzida = (producao_barris_dia * random.randint(10, 40))
+                        agua_produzida = (producao_barris_dia * random.uniform(0.1, 0.4))
                         tempo_operacao_horas = random.uniform(0.0, 24.0)
                         pressao_bar = random.randint(150, 450)
                         temperatura_celsius = random.uniform(60.0, 120.0)
@@ -313,7 +313,7 @@ class FakeData():
         
     def generate_incidentes_table(
             self,
-            tamanho_lote: int = 250,
+            tamanho_lote: int = 300,
             df_equipamentos: Optional[pd.DataFrame] = None,
             df_producao: Optional[pd.DataFrame] = None,
             lista_incidentes: Optional[List[str]] = None
@@ -345,7 +345,7 @@ class FakeData():
                 lista_incidentes = []
                 print(f"Sem registros de incidentes no Banco de Dados.")
 
-            chunk_size = 125
+            chunk_size = 100
             chunks = []
             incidentes_cadastrados = set(lista_incidentes)
             novos_incidentes = []
