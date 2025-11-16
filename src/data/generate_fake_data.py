@@ -2,38 +2,48 @@ import pandas as pd
 import numpy as np
 import random
 
-from datetime import datetime, timedelta
-from typing import Optional, List, Dict
+from datetime import timedelta
+from typing import Optional
 from faker import Faker
+
+from src.database.db_connection import GasDataBase
 
 fake = Faker('pt_BR')
 
 class FakeData():
     """Classe para criar as tabelas de exemplo do projeto usando Faker."""
-    def __init__(self):
-        pass
+    def __init__(self, db_connection=None):
+        """
+        Args:
+            db_connection: Conexão com o Banco de Dados (Opcional).
+        """
+        self.db_connection = db_connection
 
-
-    def generate_pocos_table(self, tamanho_lote: int = 100, lista_dados: Optional[List] = None) -> pd.DataFrame:
+    def generate_pocos_table(
+            self,
+            tamanho_lote: int = 100,
+        ) -> pd.DataFrame:
         """
         Gera dados de cadastro de Poços usando Faker e retorna um Dataframe.
 
         Args:
             - tamanho_lote (int): Quantidade de Dados a serem gerados, por padrão gera 100 registros.
-            - lista_dados (Optional[List]): Lista de cadastro de Poços já salvos no Banco de Dados
-                usado para não duplicar os cadastros a cada nova geração.
 
         Returns:
             Dataframe: DataFrame com os dados estruturados para validação com o Pandera.
         """
         try:
-            if not lista_dados:
-                print("Sem registros para serem verificados no Banco.")
-                lista_dados = []
-            
+            if self.db_connection:
+                pocos_cadastrados = self.db_connection.get_existing_codes(
+                    table_name='raw_pocos',
+                    code_column='codigo_poco',
+                )
+            else:
+                print("Sem conexão com o banco, gerando sem verificação de duplicidade.")
+                pocos_cadastrados = set()
+
             chunk_size = 50
             chunks = []
-            pocos_cadastrados = set(lista_dados)
             novos_pocos = []
             
             for chunk_start in range(0, tamanho_lote, chunk_size):
@@ -107,7 +117,6 @@ class FakeData():
             self, 
             tamanho_lote: int = 500,
             df_pocos: Optional[pd.DataFrame] = None,
-            lista_equipamentos: Optional[List[str]] = None
         ) -> pd.DataFrame:
         """
         Gera dados de cadastro de Equipamentos usando Faker e retorna um Dataframe.
@@ -116,7 +125,6 @@ class FakeData():
             - tamanho_lote (int): Quantidade de Dados a serem gerados, por padrão gera 500 registros.
             - df_pocos (Optional[DataFrame]): Lista de cadastro de Poços já salvos no Banco de Dados
                 usado para não duplicar os cadastros a cada nova geração.
-            - lista_equipamentos (Optional[List[str]]): Lista de código de equipamentos já cadastrados.
 
         Returns:
             Dataframe: DataFrame com os dados estruturados para validação com o Pandera.
@@ -126,13 +134,17 @@ class FakeData():
                 print("Erro: Não é possível gerar equipamentos, nenhum poço foi passado.")
                 return pd.DataFrame()
             
-            if lista_equipamentos is None:
-                lista_equipamentos = []
-                print(f"Sem equipamento cadastrados no Banco de Dados.")
+            if self.db_connection:
+                equipamentos_cadastrados = self.db_connection.get_existing_codes(
+                    table_name='raw_equipamentos',
+                    code_column='cod_equipamento'
+                )
+            else:
+                print("Sem conexão com o banco, gerando sem verificação de duplicidade.")
+                equipamentos_cadastrados = set()
 
             chunk_size = 100
             chunks = []
-            equipamentos_cadastrados = set(lista_equipamentos)
             novos_equipamentos = []
 
             nome_pocos = df_pocos[['codigo_poco', 'data_perfuracao']].to_dict('records')
@@ -211,7 +223,6 @@ class FakeData():
             self,
             tamanho_lote: int = 500,
             df_pocos: Optional[pd.DataFrame] = None,
-            lista_producao: Optional[List[str]] = None
         ) -> pd.DataFrame:
         """
         Gera dados de produção aleatórios usando Faker e retorna um DataFrame.
@@ -220,8 +231,6 @@ class FakeData():
             - tamanho_lote (int): Quantidade de Dados a serem gerados, por padrão gera 500 registros.
             - df_pocos (Optinonal[DataFrame]): Lista de cadastro de poços gerados, usado para referenciar
                 os dados na hora da geração.
-            - lista_producao (Optional[List[str]]): Lista de cadastro dos registros de produção, usada para
-                não duplicar os registros existentes.
 
         Returns:
             DataFrame: DataFrame com os dados estruturados para validação com Pandera.
@@ -231,13 +240,17 @@ class FakeData():
                 print("Erro: Não é possível gerar registros de produção, nenhum poço foi passado.")
                 return pd.DataFrame()
             
-            if lista_producao is None:
-                lista_producao = []
-                print("Sem registros de Produção no Banco de Dados.")
+            if self.db_connection:
+                registros_producao = self.db_connection.get_existing_codes(
+                    table_name='raw_producao',
+                    code_column='cod_producao'
+                )
+            else:
+                print("Sem conexão com o banco, gerando sem verificação de duplicidade.")
+                registros_producao = set()
 
             chunk_size = 100
             chunks = []
-            registros_producao = set(lista_producao)
             novos_registros_producao = []
 
             data_pocos = df_pocos[['codigo_poco', 'tipo_poco', 'data_perfuracao']].to_dict('records')
@@ -315,8 +328,7 @@ class FakeData():
             self,
             tamanho_lote: int = 300,
             df_equipamentos: Optional[pd.DataFrame] = None,
-            df_producao: Optional[pd.DataFrame] = None,
-            lista_incidentes: Optional[List[str]] = None
+            df_producao: Optional[pd.DataFrame] = None
         ) -> pd.DataFrame:
         """
         Gera dados de incidentes usando Fake e retorna um DataFrame.
@@ -327,8 +339,6 @@ class FakeData():
                 usado para referenciar os dados na hora da geração.
             df_producao (Optional[DataFrame]): DataFrame com os registros de produção usado para
                 referenciar os dados de *data* na hora da geração
-            lista_incidentes (Optional[List[str]]): Lista de incidentes já gerados, usada para garantir
-                que nenhum registro de incidente seja duplicado.
         
         Returns:
             DataFrame: DataFrame com os dados estruturados para validação com Pandera.
@@ -341,13 +351,17 @@ class FakeData():
                 print("Erro: Não foi possível gerar registros de incidentes. Nenhum registro de produção foi passado.")
                 return pd.DataFrame()
             
-            if lista_incidentes is None:
-                lista_incidentes = []
-                print(f"Sem registros de incidentes no Banco de Dados.")
+            if self.db_connection:
+                incidentes_cadastrados = self.db_connection.get_existing_codes(
+                    table_name='raw_incidentes',
+                    code_column='cod_incidente'
+                )
+            else:
+                print("Sem conexão com o banco, gerando sem verificação de duplicidade.")
+                incidentes_cadastrados = set()
 
             chunk_size = 100
             chunks = []
-            incidentes_cadastrados = set(lista_incidentes)
             novos_incidentes = []
 
             data_equipamentos = df_equipamentos[['cod_equipamento', 'cod_poco']].to_dict('records')
