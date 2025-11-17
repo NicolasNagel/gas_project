@@ -87,7 +87,7 @@ class ValidateSchema():
                     "data_instalacao": pa.Column(date, nullable=False),
                     "vida_util_anos": pa.Column(int, pa.Check.between(10, 25), nullable=False),
                     "ultimo_teste": pa.Column(date, nullable=False),
-                    "eficiencia_percentual": pa.Column(float, pa.Check.between(0.6, 1), nullable=False)
+                    "eficiencia_operacional": pa.Column(float, pa.Check.between(0.6, 1), nullable=False)
                 }, strict=True
             )
 

@@ -75,13 +75,17 @@ class GasDataBase():
 
         Raises:
             Exception: Erro crítico ao checar a quantidade de registros no Banco de Dados.
+
+        Example:
+            >>> db.check_table_values_into_db()
+            {'raw_pocos': 150, 'raw_equipamentos': 500, ...}
         """
         try:
             if table_name is None:
-                print(f"Nenhuma tabela foi passada, verificando o registro de todas as tabelas.")
-                tabelas_projeto = list(self.orm_mapping.values())
+                print(f"Nenhuma tabela foi passada, verificando o registro de todas as tabelas.\n")
+                tabelas_projeto = list(self.orm_mapping.keys())
             else:
-                print(f"{len(table_name)} Tabelas para serem verificados os registros.")
+                print(f"{len(table_name)} Tabelas para serem verificados os registros.\n")
                 tabelas_projeto = table_name
 
             resultado = {}
@@ -101,8 +105,7 @@ class GasDataBase():
                         if contagem == 0:
                             print(f"{tabelas}: 0 registros (vazia)")
                         else:
-                            print(f"Erro ao contar os registros de: {tabelas} - {str(e)}")
-                            resultado[tabelas] = 0
+                            print(f"{tabelas}: {contagem} registros")
 
                     except Exception as e:
                         print(f"Erro ao contar {tabelas}: {str(e)}")
@@ -170,7 +173,7 @@ class GasDataBase():
                         session.bulk_insert_mappings(orm_class, records)
 
                         quantidade = len(records)
-                        resultado = nome_tabela[resultado]
+                        resultado[nome_tabela] = quantidade
 
                         print(f"{quantidade} de registros inseridos")
 

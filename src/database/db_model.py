@@ -32,7 +32,7 @@ class EquipamentosTable(Base):
     tipo_equipamento = Column(String, nullable=False)
     marca = Column(String, nullable=False)
     modelo = Column(String, nullable=False)
-    data_instalcao = Column(DateTime, nullable=False)
+    data_instalacao = Column(DateTime, nullable=False)
     vida_util_anos = Column(Integer, nullable=False)
     ultimo_teste = Column(DateTime, nullable=False)
     eficiencia_operacional = Column(Float, nullable=False)

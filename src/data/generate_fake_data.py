@@ -189,7 +189,7 @@ class FakeData():
                             "data_instalacao": data_instalacao,
                             "vida_util_anos": vida_util,
                             "ultimo_teste": ultimo_teste,
-                            "eficiencia_percentual": eficiencia
+                            "eficiencia_operacional": eficiencia
                         }) 
 
                     except Exception as e:
