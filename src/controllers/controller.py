@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict
+from typing import Optional, Dict
 from datetime import datetime
 import pandas as pd
 
@@ -319,6 +319,10 @@ class PipelineController():
 
         Args:
             confirm: Deve ser True para executar (segurança).
+
+        Example:
+            >>> # Limpar todas as tabelas
+            >>> controller.truncate_all_tables(confirm=True)
         """
         if not confirm:
             print(f"Para limpar as tabelas, passe confirm=True")

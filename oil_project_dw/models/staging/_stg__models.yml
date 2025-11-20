@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: stg_pocos
+    description: "Staging - Poços com nomenclatura padronizada"
+    columns:
+      - name: poco_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      
+      - name: poco_codigo
+        description: "Código único do poço"
+        tests:
+          - unique
+          - not_null
+      
+      - name: poco_tipo
+        description: "Tipo de poço (1=Marítimo, 2=Terrestre)"
+        tests:
+          - accepted_values:
+              values: [1, 2]
+      
+      - name: poco_status
+        description: "Status operacional"
+        tests:
+          - accepted_values:
+              values: ['Ativo', 'Manutenção', 'Inativo']
+
+  - name: stg_equipamentos
+    description: "Staging - Equipamentos com campos calculados"
+    columns:
+      - name: equipamento_id
+        tests:
+          - unique
+          - not_null
+      
+      - name: equipamento_eficiencia_percentual
+        description: "Eficiência do equipamento (0.6 a 1.0)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0.6
+              max_value: 1.0
+
+  - name: stg_producao
+    description: "Staging - Produção com métricas calculadas"
+    columns:
+      - name: producao_id
+        tests:
+          - unique
+          - not_null
+      
+      - name: producao_petroleo_barris_dia
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 200000
+
+  - name: stg_incidentes
+    description: "Staging - Incidentes com priorização"
+    columns:
+      - name: incidente_id
+        tests:
+          - unique
+          - not_null
+      
+      - name: incidente_severidade
+        tests:
+          - accepted_values:
+              values: ['Baixa', 'Média', 'Alta']

@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import random
 
 from datetime import timedelta
@@ -17,7 +16,7 @@ class FakeData():
         Args:
             db_connection: Conexão com o Banco de Dados (Opcional).
         """
-        self.db_connection = db_connection
+        self.db_connection = db_connection if db_connection else GasDataBase()
 
     def generate_pocos_table(
             self,

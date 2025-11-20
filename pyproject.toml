@@ -6,14 +6,17 @@ authors = [
     {name = "Nicolas",email = "nicolascnagel@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.14"
 dependencies = [
     "pandas (>=2.3.3,<3.0.0)",
     "faker (>=38.0.0,<39.0.0)",
     "sqlalchemy (>=2.0.44,<3.0.0)",
     "psycopg2-binary (>=2.9.11,<3.0.0)",
     "pandera (>=0.26.1,<0.27.0)",
-    "python-dotenv (>=1.2.1,<2.0.0)"
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "apache-airflow (>=3.1.3,<4.0.0)",
+    "dbt-core (>=1.10.15,<2.0.0)",
+    "dbt-postgres (>=1.9.1,<2.0.0)"
 ]
 
 

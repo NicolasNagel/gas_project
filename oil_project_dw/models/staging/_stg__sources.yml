@@ -1,0 +1,66 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Dados brutos do sistema de petróleo e gás"
+    database: database_3i2q
+    schema: public
+    
+    tables:
+      - name: raw_pocos
+        description: "Tabela de cadastro de poços"
+        columns:
+          - name: id
+            description: "Primary key"
+            tests:
+              - unique
+              - not_null
+          - name: codigo_poco
+            description: "Código único do poço (POCO_XXX)"
+            tests:
+              - unique
+              - not_null
+      
+      - name: raw_equipamentos
+        description: "Tabela de equipamentos instalados"
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: cod_equipamento
+            tests:
+              - unique
+              - not_null
+          - name: cod_poco
+            tests:
+              - not_null
+              - relationships:
+                  to: source('raw', 'raw_pocos')
+                  field: codigo_poco
+      
+      - name: raw_producao
+        description: "Registros diários de produção"
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: cod_poco
+            tests:
+              - relationships:
+                  to: source('raw', 'raw_pocos')
+                  field: codigo_poco
+      
+      - name: raw_incidentes
+        description: "Registros de incidentes operacionais"
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: cod_equipamento
+            tests:
+              - relationships:
+                  to: source('raw', 'raw_equipamentos')
+                  field: cod_equipamento

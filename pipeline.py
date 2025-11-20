@@ -6,8 +6,6 @@ def main():
 
     controller.check_database_status()
 
-    controller.truncate_all_tables(confirm=True)
-
     controller.run_full_pipeline()
 
     controller.check_database_status()
