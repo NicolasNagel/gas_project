@@ -1,0 +1,206 @@
+version: 2
+
+models:
+  - name: mart_core_dim_pocos
+    columns:
+      - name: sk_poco
+        tests:
+          - unique
+          - not_null
+
+      - name: nk_poco_cod
+        tests:
+          - not_null
+
+      - name: poco_nm
+        tests:
+          - not_null
+
+      - name: poco_tipo_id
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['1','2']
+
+      - name: poco_regiao_desc
+        tests:
+          - accepted_values:
+              values: ['Sudeste','Nordeste','Outro']
+
+  - name: mart_core_dim_equipamentos
+    columns:
+      - name: sk_equip
+        tests:
+          - unique
+          - not_null
+
+      - name: nk_equip_cod
+        tests:
+          - not_null
+
+      - name: fk_poco
+        tests:
+          - not_null
+          - relationships:
+              to: ref('mart_core_dim_pocos')
+              field: sk_poco
+
+      - name: equip_tp_desc
+        tests:
+          - not_null
+
+      - name: equip_eficiencia_opr
+        tests:
+          - not_null
+
+  - name: mart_core_fact_producao
+    columns:
+      - name: sk_prod
+        tests:
+          - not_null
+          - unique
+      
+      - name: fk_poco
+        tests:
+          - not_null
+          - relationships:
+              to: ref('mart_core_dim_pocos')
+              field: sk_poco
+
+      - name: dt_producao
+        tests:
+          - not_null
+
+      - name: prod_vlr_barris
+        tests:
+          - not_null
+
+      - name: prod_pct_disponibilidade
+        tests:
+          - not_null
+
+  - name: int_fact_incidentes
+    description: >
+      Tabela Fato de Incidentes Operacionais envolvendo Equipamentos e Poços.
+      Contém métricas de impacto, custo, severidade, prioridade,
+      tempo de parada e status para análise geral de desempenho operacional.
+
+    columns:
+      - name: sk_incidente
+        description: Chave substituta única da tabela fato.
+        tests:
+          - unique
+          - not_null
+
+      - name: fk_poco
+        description: Chave para a dimensão de Poços Pré-Sal.
+        tests:
+          - relationships:
+              to: ref('int_dim_pocos')
+              field: sk_poco
+          - not_null
+
+      - name: fk_equipamento
+        description: Chave para a dimensão de Equipamentos da operação.
+        tests:
+          - relationships:
+              to: ref('int_dim_equipamentos')
+              field: sk_equip
+          - not_null
+
+      - name: nk_incidente_cod
+        description: Código natural do incidente no sistema fonte.
+        tests:
+          - not_null
+
+      - name: nk_poco_cod
+        description: Código natural do poço no sistema fonte.
+
+      - name: nk_equip_cod
+        description: Código natural do equipamento no sistema fonte.
+
+      - name: dt_incidente
+        description: Data do incidente ocorrido.
+        tests:
+          - not_null
+
+      - name: ano_incidente
+        description: Ano do incidente.
+
+      - name: mes_incidente
+        description: Mês do incidente.
+
+      - name: trimestre_incidente
+        description: Trimestre do incidente.
+
+      - name: ano_mes_incidente
+        description: Ano e mês formatados (YYYY-MM).
+
+      - name: incid_tp_dsc
+        description: Tipo do incidente (Categoria do evento).
+
+      - name: incid_severidade_dsc
+        description: Severidade informada (Alta, Média, Baixa).
+
+      - name: incid_prioridade_dsc
+        description: Prioridade definida pelo sistema/fonte.
+
+      - name: incid_impacto_class_dsc
+        description: Classificação de impacto operacional.
+
+      - name: incid_custo_class_desc
+        description: Classificação do custo estimado.
+
+      - name: incid_status_desc
+        description: Status final da resolução.
+
+      - name: incid_qtd_horas_parada
+        description: Quantidade de horas de parada do equipamento.
+
+      - name: incid_qtd_dias_parada
+        description: Quantidade de dias de parada (derivação da fonte).
+
+      - name: incid_vlr_custo
+        description: Custo estimado do incidente em reais (R$).
+
+      - name: flg_severidade_alta
+        description: Flag quando severidade é Alta.
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+      - name: flg_prioridade_critica
+        description: Flag quando prioridade é Crítica.
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+      - name: flg_parada_longa
+        description: Flag para incidentes com parada > 24h.
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+      - name: flg_custo_alto
+        description: Flag para incidentes com custo > R$1Mi.
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+      - name: flg_resolvido
+        description: Flag para incidentes resolvidos.
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+      - name: flg_pendente
+        description: Flag para incidentes pendentes.
+        tests:
+          - accepted_values:
+              values: [true, false]
+
+      - name: dt_carga_staging
+        description: Data de carga da camada staging.
+
+      - name: dt_carga_intermediate
+        description: Data de carga da camada intermediate.

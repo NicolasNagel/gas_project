@@ -1,0 +1,73 @@
+version: 2
+
+models:
+  - name: int_dim_pocos
+    description: "Dimensão de poços enriquecida com SKs e flags"
+    columns:
+      - name: sk_poco
+        description: "Surrogate key (hash MD5 do código natural)"
+        tests:
+          - unique
+          - not_null
+      
+      - name: nk_poco_cod
+        description: "Natural key - código de negócio do poço"
+        tests:
+          - unique
+          - not_null
+      
+      - name: flg_ativo
+        description: "Flag indicando se o poço está ativo"
+      
+      - name: flg_pre_sal
+        description: "Flag indicando se é poço pré-sal"
+
+  - name: int_dim_equipamentos
+    description: "Dimensão de equipamentos com relacionamento para poços"
+    columns:
+      - name: sk_equip
+        tests:
+          - unique
+          - not_null
+      
+      - name: fk_poco
+        description: "Foreign key para dimensão de poços"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_dim_pocos')
+              field: sk_poco
+
+  - name: int_fato_producao
+    description: "Fato de produção com métricas e relacionamentos"
+    columns:
+      - name: sk_prod
+        tests:
+          - unique
+          - not_null
+      
+      - name: fk_poco
+        tests:
+          - relationships:
+              to: ref('int_dim_pocos')
+              field: sk_poco
+
+  - name: int_fato_incidentes
+    description: "Fato de incidentes com severidade e impacto"
+    columns:
+      - name: sk_incid
+        tests:
+          - unique
+          - not_null
+      
+      - name: fk_poco
+        tests:
+          - relationships:
+              to: ref('int_dim_pocos')
+              field: sk_poco
+      
+      - name: fk_equip
+        tests:
+          - relationships:
+              to: ref('int_dim_equipamentos')
+              field: sk_equip
